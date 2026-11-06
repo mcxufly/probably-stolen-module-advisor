@@ -1,0 +1,9 @@
+bin/
+obj/
+dist/
+.inspect/
+.tools/
+.dotnet/
+.nuget/
+*.zip
+*.log

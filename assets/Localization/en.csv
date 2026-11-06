@@ -1,0 +1,42 @@
+title,Module Advisor
+hotkey,Open Module Advisor
+loaded,Module Advisor is ready. Press {0} to open.
+intro,Select machines and idle modules, choose a priority, then generate. Open the Results tab to review.
+refresh,Refresh items
+close,Close
+generate,Generate plan
+balanced,Balanced
+performance,Performance first
+efficiency,Efficiency first
+quality,Quality first
+machines,Machines ({0})
+modules,Idle modules ({0})
+results,Results
+all,Select all
+none,Select none
+machine_info,{0} free cells · {1} installed modules/nodes
+manual_machine,This machine's stat consumers have not been verified. Compatibility reference only.
+no_machines,No owned machines with a native module panel were found.
+manual,Function reference
+no_modules,No removable owned idle modules found. Installed, locked, unremovable or unowned modules are excluded.
+press_generate,Generate a plan after changing selections. Refresh and select newly acquired items first.
+select_first,Select at least one machine and one idle module that is still available.
+plan_count,Recommended additions: {0}
+plan_note,Existing modules stay in place. Recommended positions do not overlap. Install manually. Scores estimate base benefits for verified machines; the chosen priority has triple weight. Top/left mounting effects are included. Adjacency, thresholds, caps and long-term effects are not modeled. This heuristic does not guarantee a global optimum.
+bay,Module bay {0}
+placement,{0} → top-left (column {1}, row {2}), rotation {3}°, flipped: {4}
+estimate,Estimated module stats: performance {0}% / efficiency {1}% / quality {2}% · priority score {3}
+yes,Yes
+no,No
+unassigned,Unassigned / function reference
+no_fit,No compatible free position in the selected machines, or four chemical upgrades already installed. Check type, space and whether the machine is working.
+optional,Compatible options: {0}. Each is checked individually against the current bay; plan space is not reserved here. Read the hover description for the function and tradeoffs before deciding.
+not_chosen,No positive benefit for this priority, or space was assigned to other modules. Change priority or select fewer machines and regenerate.
+all_assigned,All selected modules have been assigned.
+refresh_note,This is a snapshot. Regenerate after moving, selling or installing modules or changing machine state. Function references may compete for the same space.
+stats,Base stats: performance {0}% / efficiency {1}% / quality {2}%
+location,Container: {0}
+unknown_location,Store inventory
+permanent,Chemical upgrades lock on installation; a native module extractor can unlock them. The advisor only provides a compatibility reference.
+too_large,Too many selected machines and modules. Select a smaller group and regenerate (maximum 80000 position checks).
+error,Could not generate the plan. Items may have changed. Refresh and retry; see the game log for details.

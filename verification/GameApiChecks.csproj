@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType><TargetFramework>net8.0</TargetFramework>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <ManagedDir Condition="'$(ManagedDir)' == ''">/data/SteamLibrary/steamapps/common/Probably Stolen/Probably Stolen_Data/Managed</ManagedDir>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Program.cs" />
+    <Compile Include="../src/GameAdapter.cs" />
+    <Compile Include="../src/Planner.cs" />
+    <Reference Include="Assembly-CSharp"><HintPath>$(ManagedDir)/Assembly-CSharp.dll</HintPath></Reference>
+    <Reference Include="DseCecil"><HintPath>$(ManagedDir)/DseCecil.dll</HintPath></Reference>
+    <Reference Include="UnityEngine.CoreModule"><HintPath>$(ManagedDir)/UnityEngine.CoreModule.dll</HintPath></Reference>
+    <Reference Include="0Harmony"><HintPath>$(ManagedDir)/0Harmony.dll</HintPath></Reference>
+  </ItemGroup>
+</Project>

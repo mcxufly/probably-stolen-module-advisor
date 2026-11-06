@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Manifest>
+  <ID>xufly_module_advisor</ID>
+  <Name>模块搭配助手 / Module Advisor</Name>
+  <Author>XuFly</Author>
+  <ModVersion>0.1.0</ModVersion>
+  <Description>选择自有机器和空闲模块，按实际类型与占格推荐搭配。仅预览，不安装、不改变存档物品。Select owned machines and idle modules for compatible placement suggestions. Preview only; no item or save changes.</Description>
+  <GameVersions><Version>0.46D</Version></GameVersions>
+  <Prerequisites />
+  <Assemblies><Assembly>ProbablyStolenModuleAdvisor.dll</Assembly></Assemblies>
+  <Capabilities />
+</Manifest>
