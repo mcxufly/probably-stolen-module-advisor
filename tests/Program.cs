@@ -17,7 +17,7 @@ internal static class Program
             ("invalid input rejected", Validation),
             ("200 randomized invariant checks", Randomized),
             ("large candidate budget preserves and completes plans", Budget)
-        };
+        }.Concat(LayoutTests.Cases).ToArray();
         try
         {
             foreach (var test in tests)

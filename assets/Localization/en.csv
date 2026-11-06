@@ -22,7 +22,7 @@ no_modules,No removable owned idle modules found. Installed, locked, unremovable
 press_generate,Generate a plan after changing selections. Refresh and select newly acquired items first.
 select_first,Select at least one machine and one idle module that is still available.
 plan_count,Recommended additions: {0}
-plan_note,Existing modules stay in place. Recommended positions do not overlap. Install manually. Scores estimate base benefits for verified machines; the chosen priority has triple weight. Top/left mounting effects are included. Adjacency, thresholds, caps and long-term effects are not modeled. This heuristic does not guarantee a global optimum.
+plan_note,Installed modules stay fixed. Whole-bay simulation includes nodes, receivers, negative feedback and mounting effects on new and existing items, then compares effective gains with known thresholds/caps. Chosen priority has triple weight. Bounded heuristic, not a global optimum; no prediction of degradation or destruction.
 bay,Module bay {0}
 placement,{0} → top-left (column {1}, row {2}), rotation {3}°, flipped: {4}
 estimate,Estimated module stats: performance {0}% / efficiency {1}% / quality {2}% · priority score {3}
@@ -40,3 +40,31 @@ unknown_location,Store inventory
 permanent,Chemical upgrades lock on installation; a native module extractor can unlock them. The advisor only provides a compatibility reference.
 too_large,Too many selected machines and modules. Select a smaller group and regenerate (maximum 80000 position checks).
 error,Could not generate the plan. Items may have changed. Refresh and retry; see the game log for details.
+diagram_large,This bay is too large for the diagram. Use the coordinates below.
+diagram_legend,Layout: X blocked · free · E existing · N recommended addition. Cells with the same ID form one item. Hover for details.
+diagram_blocked,Blocked cell
+diagram_free,Free cell
+diagram_column,Column (left to right)
+diagram_row,Row (top to bottom)
+totals_change,Whole-bay P/E/Q: {0}% / {1}% / {2}% → {3}% / {4}% / {5}% (includes changed effects on installed items)
+estimate_layout,This item's final layout stats: performance {0}% / efficiency {1}% / quality {2}%
+metrics_basic,Reference speed {0} → {1} · power/cycle {2} → {3} · quality bonus {4} → {5}
+metrics_alarm,Effective theft prevention {0}% → {1}% · power/cycle {2} → {3}
+metrics_furnace,Power/cycle {2} → {3} · ingot tier for current inputs {4} → {5} (0 lowest; 5 perfect)
+metrics_furnace_offset,Power/cycle {2} → {3} · quality tier offset {4} → {5} (not enough material to predict the final tier)
+metrics_dna,Speed {0} → {1} · power/cycle {2} → {3} · success on next start with current seed {4}% → {5}%
+metrics_water,Reference water yield {0}mL → {1}mL · power/cycle {2} → {3} · water tier {4} → {5} (0 lowest; 5 pure)
+metrics_purifier,Clean-water reference budget multiplier {0}% → {1}% · power/cycle {2} → {3} · purity ceiling {4}% → {5}%
+metrics_evaporator,Evaporation budget {0}mL → {1}mL · power/cycle {2} → {3} · condensate recovery {4}% → {5}%
+metrics_projector,Attraction {0} → {1} · power/cycle {2} → {3}
+metrics_deal,Power/cycle {2} → {3} · bargaining chance bonus {4} → {5} (not final success probability)
+cap_power,Power has reached the native minimum of 1. More efficiency cannot reduce this power cost.
+cap_performance,This performance outcome has reached its effective probability ceiling.
+cap_quality,Quality has reached the current recipe/machine ceiling. Extra quality adds no further benefit to this outcome.
+metrics_hydro,Growth speed {0} → {1} · power/cycle {2} → {3} · reference harvest count {4} → {5}
+context_hydro,Reference count uses current seed and native rounding, excluding health, harvest callbacks and byproducts. Hydroreed ignores that count, so its quality utility is zero. Without a seed, only quality bonus is shown.
+context_dna,With a seed, uses its current complexity and the 5%–100% clamp. Without one, shows quality bonus only. An already-started operation keeps its stored chance.
+context_furnace,With enough material, includes the native consumption order, blast module and flux; final tier is clamped to 0–5. Without it, scores the tier offset only.
+context_printer,Printer quality depends on the recipe. Melee condition has tiers, while frames and some gun stats have no general ceiling. No universal quality cap is invented.
+context_purifier,Reference assumes purity ≥98% (dirt multiplier 1). Actual cleanup budget also depends on volume and dirt. The stepped purity ceiling follows native rules.
+context_deal,Final bargain probability caps at 100%, but depends on customer, offer and events. No fixed quality threshold is assumed to guarantee success.

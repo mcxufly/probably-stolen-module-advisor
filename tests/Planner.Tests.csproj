@@ -10,5 +10,7 @@
   <ItemGroup>
     <Compile Remove="compatibility/**" />
     <Compile Include="../src/Planner.cs" Link="Planner.cs" />
+    <Compile Include="../src/LayoutSimulation.cs" Link="LayoutSimulation.cs" />
+    <Compile Include="../src/LayoutPlanner.cs" Link="LayoutPlanner.cs" />
   </ItemGroup>
 </Project>

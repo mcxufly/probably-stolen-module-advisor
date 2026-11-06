@@ -6,6 +6,11 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Program.cs" />
+    <Compile Include="LayoutChecks.cs" />
+    <Compile Include="../src/LayoutSimulation.cs" />
+    <Compile Include="../src/LayoutPlanner.cs" />
+    <Compile Include="../src/MachineModel.cs" />
+    <Compile Include="../src/GameEvaluation.cs" />
     <Compile Include="../src/GameAdapter.cs" />
     <Compile Include="../src/Planner.cs" />
     <Reference Include="Assembly-CSharp"><HintPath>$(ManagedDir)/Assembly-CSharp.dll</HintPath></Reference>

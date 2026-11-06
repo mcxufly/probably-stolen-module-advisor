@@ -70,6 +70,7 @@ static class Program
             "Preview shape mutated source.");
         Console.WriteLine($"Real GridShape checks passed: default bay {free} free cells, {cases} rotation/flip cases.");
 
+        LayoutChecks.Run();
         string folder = Path.GetFullPath("dist/ModuleAdvisor");
         var manifest = ModLoader.ParseManifestForTools(folder, out string problem);
         Check(manifest != null && problem == null, "Manifest invalid: " + problem);
@@ -91,6 +92,8 @@ static class Program
             string[] mutations = {"TryAcceptOnce", "AcceptUnchecked", "UncheckedAccept", "Expel", "SetModuleStuck",
                 "ComputeAllModuleTempStat", "ComputeModuleEffect", "TryFindOneValidInventorySlot", "GetUniqueID", "GetTagReadonly"};
             Check(!references.Any(r => mutations.Contains(r.Name)), "Preview contains an unexpected mutable game API.");
+            Check(!references.Any(r => r.DeclaringType.Name == "CustomUIBuilder" && r.Name == "GetWindow"),
+                "Diagram must not use the builder getter that hides the live window.");
         }
         var scan = ModScanner.Scan(new[] {dll}, allowed, folder, false);
         Console.WriteLine("Manifest and compatibility passed: " + manifest.ID + " / " + manifest.ModVersion + " / " + args[0]);

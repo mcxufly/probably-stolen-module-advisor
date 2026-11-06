@@ -19,6 +19,9 @@ for key in zh:
     assert sorted(re.findall(r'\{\d+\}', zh[key])) == sorted(re.findall(r'\{\d+\}', en[key])), key
 used = set()
 for file in (ROOT / 'src').glob('*.cs'):
-    used.update(re.findall(r'L\.Text\("([a-z_]+)"', file.read_text()))
+    source = file.read_text()
+    used.update(re.findall(r'L\.Text\("([a-z_]+)"', source))
+    used.update(re.findall(r'"(metrics_[a-z_]+)"', source))
+    used.update(re.findall(r'"(diagram_(?:blocked|free))"', source))
 assert used <= en.keys(), f'missing translations: {used - en.keys()}'
 print(f'Localization passed: {len(en)} matching keys; {len(used)} source keys covered.')

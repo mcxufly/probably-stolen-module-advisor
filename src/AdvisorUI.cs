@@ -107,6 +107,37 @@ namespace ModuleAdvisor
             if (results != null && window != null) ResultBuilder().AddLabel(L.Text("press_generate"));
         }
 
+        private static void ShowMetrics(CustomUIBuilder output, GameItem machine, BayPrediction prediction)
+        {
+            var before = prediction.BeforeMetrics;
+            var after = prediction.AfterMetrics;
+            string key;
+            switch (machine.identifier)
+            {
+                case "hydroponic": key = prediction.Model.HydroBaseHarvest.HasValue ? "metrics_hydro" : "metrics_basic"; break;
+                case "security_alarm": key = "metrics_alarm"; break;
+                case "furnace": key = prediction.Model.FurnaceInputQuality.HasValue ? "metrics_furnace" : "metrics_furnace_offset"; break;
+                case "plant_dna_manipulator": key = prediction.Model.DnaBaseChance.HasValue ? "metrics_dna" : "metrics_basic"; break;
+                case "moisture_farm": key = "metrics_water"; break;
+                case "water_purifier": key = "metrics_purifier"; break;
+                case "evaporator": key = "metrics_evaporator"; break;
+                case "mirage_projector": key = "metrics_projector"; break;
+                case "deal_maker": key = "metrics_deal"; break;
+                default: key = "metrics_basic"; break;
+            }
+            output.AddLabel(L.Text(key, before.Performance, after.Performance, before.Power, after.Power,
+                before.Quality, after.Quality));
+            if (after.PowerFloor) output.AddLabel(L.Text("cap_power"));
+            if (after.PerformanceCapped) output.AddLabel(L.Text("cap_performance"));
+            if (after.QualityCapped) output.AddLabel(L.Text("cap_quality"));
+            if (machine.identifier == "hydroponic") output.AddLabel(L.Text("context_hydro"));
+            if (machine.identifier == "plant_dna_manipulator") output.AddLabel(L.Text("context_dna"));
+            if (machine.identifier == "furnace") output.AddLabel(L.Text("context_furnace"));
+            if (machine.identifier == "printer") output.AddLabel(L.Text("context_printer"));
+            if (machine.identifier == "water_purifier") output.AddLabel(L.Text("context_purifier"));
+            if (machine.identifier == "deal_maker") output.AddLabel(L.Text("context_deal"));
+        }
+
         private static void Generate()
         {
             if (!IsOpen || results == null) return;
@@ -129,25 +160,33 @@ namespace ModuleAdvisor
                     return;
                 }
                 var options = GameAdapter.Options(selectedModules, selectedBays, preference);
-                var plan = Planner.Solve(selectedModules.Count, options);
+                var evaluator = new GameEvaluation(selectedBays, selectedModules, options, preference);
+                var nodeModules = new HashSet<int>(Enumerable.Range(0, selectedModules.Count)
+                    .Where(m => selectedModules[m].IsGameItemType("NODE")));
+                var plan = LayoutPlanner.Solve(selectedModules.Count, options, evaluator.Evaluate, nodeModules);
                 output.AddHeader(L.Text("plan_count", plan.Placements.Count));
                 output.AddLabel(L.Text("plan_note"));
                 var used = new HashSet<int>();
                 foreach (var group in plan.Placements.GroupBy(p => p.Bay))
                 {
                     var bay = selectedBays[group.Key];
+                    var additions = group.ToList();
+                    var prediction = evaluator.Predict(group.Key, plan.Placements);
                     output.AddHeader(GameAdapter.Name(bay.Machine) + " · " + L.Text("bay", bay.Number));
-                    foreach (var placement in group)
+                    BayDiagram.Draw(output, window, bay, additions, selectedModules);
+                    output.AddLabel(L.Text("totals_change", prediction.Before[0], prediction.Before[1], prediction.Before[2],
+                        prediction.After[0], prediction.After[1], prediction.After[2]));
+                    ShowMetrics(output, bay.Machine, prediction);
+                    int newIndex = 0;
+                    foreach (var placement in additions)
                     {
                         used.Add(placement.Module);
                         var module = selectedModules[placement.Module];
-                        GridShape shape = new GridShapeBuilder(module.modifiedShape).SetTransform(
-                            placement.X, placement.Y, placement.Flipped, placement.Rotation);
-                        int[] stats = GameAdapter.EstimatedStats(module, shape);
-                        output.AddLabel(L.Text("placement", GameAdapter.Name(module), placement.X + 1,
+                        int[] stats = prediction.ItemStats[prediction.ExistingCount + newIndex++];
+                        output.AddLabel("N" + newIndex + " · " + L.Text("placement", GameAdapter.Name(module), placement.X + 1,
                             placement.Y + 1, placement.Rotation * 90, placement.Flipped ? L.Text("yes") : L.Text("no")))
                             .WithTooltip(GameAdapter.Details(module));
-                        output.AddLabel(L.Text("estimate", stats[0], stats[1], stats[2], placement.Score.ToString("0.##")));
+                        output.AddLabel(L.Text("estimate_layout", stats[0], stats[1], stats[2]));
                     }
                     output.AddSeparator();
                 }

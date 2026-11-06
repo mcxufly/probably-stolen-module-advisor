@@ -57,10 +57,10 @@ namespace ModuleAdvisor
         }
 
         internal static bool ManualOnly(GameItem item) => item.IsTag(ModuleHelper.MODULE_TYPE_CHEM)
-            || item.IsGameItemType("NODE") || item.IsTag(ModuleHelper.ADDITIONAL_EFFECT_STRING);
+            || item.IsTag(ModuleHelper.ADDITIONAL_EFFECT_STRING);
 
         private static string StringTag(GameItem item, string key) => item.modifiedState.dict.TryGetValue(key, out var tag)
-            ? tag.GetString() : null;
+            && tag.IsEnabled() ? tag.GetString() : null;
 
         internal static string[] Effects(GameItem item) => new[] {
             StringTag(item, ModuleEffectHelper.MODULE_EFFECT1_TAG),
@@ -89,6 +89,8 @@ namespace ModuleAdvisor
         // Known consumers from the installed build. Unknown machines remain manual suggestions.
         internal static double[] Profile(GameItem machine)
         {
+            if (machine.IsTag(MachineHelper.MACHINE_PERFORMANCE_RATIO_INT)
+                && IntTag(machine, MachineHelper.MACHINE_PERFORMANCE_RATIO_INT) == 0) return null;
             switch (machine.identifier)
             {
                 case "hydroponic": return new[] { .5, 1.0, .5 };
@@ -140,8 +142,9 @@ namespace ModuleAdvisor
                     if (ManualOnly(modules[m]) || Profile(bays[b].Machine) == null) continue;
                     foreach (var shape in Shapes(modules[m], bays[b].Grid))
                     {
+                        // Keep neutral/negative single-item candidates: nodes, feedback and thresholds
+                        // can make their combined layout beneficial.
                         double score = Score(modules[m], bays[b], shape, preference);
-                        if (score <= 0) continue;
                         var cells = new List<int>();
                         for (int y = shape.minY; y <= shape.maxY; y++)
                             for (int x = shape.minX; x <= shape.maxX; x++)
@@ -153,6 +156,25 @@ namespace ModuleAdvisor
                 }
             return options;
         }
+
+        internal static int[] Cells(GridShape shape, int width)
+        {
+            var cells = new List<int>();
+            for (int y = shape.minY; y <= shape.maxY; y++)
+                for (int x = shape.minX; x <= shape.maxX; x++)
+                    if (shape.Get(x, y) == 1) cells.Add(y * width + x);
+            return cells.ToArray();
+        }
+
+        internal static LayoutItem ToLayout(GameItem item, GridShape shape, int width) => new LayoutItem
+        {
+            Cells = Cells(shape, width), X = shape.minX, Y = shape.minY,
+            BaseStats = new[] { Base(item, 0), Base(item, 1), Base(item, 2) },
+            IsNodeTag = item.IsTag("NODE"), IsModuleType = item.IsGameItemType("MODULE"), Effects = Effects(item)
+        };
+
+        internal static int IntTag(GameItem item, string key, int fallback = 0) =>
+            item.modifiedState.dict.TryGetValue(key, out var tag) && tag.IsEnabled() ? tag.GetInt() : fallback;
 
         internal static IEnumerable<GridShape> Shapes(GameItem module, GameGridInventory grid)
         {
