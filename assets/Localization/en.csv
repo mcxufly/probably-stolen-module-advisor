@@ -22,7 +22,7 @@ no_modules,No removable owned idle modules found. Installed, locked, unremovable
 press_generate,Generate a plan after changing selections. Refresh and select newly acquired items first.
 select_first,Select at least one machine and one idle module that is still available.
 plan_count,Recommended additions: {0}
-plan_note,Installed modules stay fixed. Whole-bay simulation includes nodes, receivers, negative feedback and mounting effects on new and existing items, then compares effective gains with known thresholds/caps. Chosen priority has triple weight. Bounded heuristic, not a global optimum; no prediction of degradation or destruction.
+plan_note,The grid and attributes below show the initial installed layout; see the forecast above for later changes. Existing items remain fixed. Whole-bay adjacency and verified caps apply. Priority has triple weight; bounded heuristic, not a global optimum.
 bay,Module bay {0}
 placement,{0} → top-left (column {1}, row {2}), rotation {3}°, flipped: {4}
 estimate,Estimated module stats: performance {0}% / efficiency {1}% / quality {2}% · priority score {3}
@@ -67,4 +67,18 @@ context_dna,With a seed, uses its current complexity and the 5%–100% clamp. Wi
 context_furnace,With enough material, includes the native consumption order, blast module and flux; final tier is clamped to 0–5. Without it, scores the tier offset only.
 context_printer,Printer quality depends on the recipe. Melee condition has tiers, while frames and some gun stats have no general ceiling. No universal quality cap is invented.
 context_purifier,Reference assumes purity ≥98% (dirt multiplier 1). Actual cleanup budget also depends on volume and dirt. The stepped purity ceiling follows native rules.
-context_deal,Final bargain probability caps at 100%, but depends on customer, offer and events. No fixed quality threshold is assumed to guarantee success.
+context_deal,Final bargain probability caps at 100%, but depends on customer, offer and events. No fixed quality threshold guarantees success. The current native deal maker does not trigger temporal effects, so it does not learn, degrade or fail from overvoltage in this forecast.
+mode_instant,Instant plan (with long-term risk report)
+mode_safe,Long-term steady (P10 cumulative gain)
+mode_mean,Long-term expected (mean cumulative gain)
+mode_burst,Short burst (first 5 uses' mean gain)
+uses_hint,Forecast uses: 1–100 native effect triggers, not days (default 30)
+forecast_title,Conditional forecast over {0} future triggers
+forecast_summary,Versus no additions: mean cumulative priority gain {0} · lower P10 {1} · chance of at least one overvoltage failure {2}% · sample paths {3}
+forecast_compare,Instant-plan reference: mean cumulative gain {0} · lower P10 {1}
+forecast_note,Steady compares P10 directly, expected compares mean, burst compares the first min(5,uses). Search uses 16 fixed paths and results are checked with 64. Mean/P10 are sample estimates; failure probability is analytic at 10% per independent trigger. No replacements or credit valuation. Current recipe/input context stays fixed; triggers are not output count. DNA chance belongs to the operation-start snapshot. Hydroponic/printer ruin insertion conservatively assumes a working/locked bay, not a simulated recipe finish time.
+forecast_approx,Ruined-module placement has remaining approximations: not all third-party predicates or operating phases are simulated. Treat this as a conditional forecast, not a guarantee.
+forecast_chart,Blue: chosen plan mean cumulative gain. Orange: instant plan mean cumulative gain. Horizontal: uses 1–{2}; vertical: {0}–{1} priority points, not credits.
+forecast_cross,From use {0}, this plan's mean cumulative gain stays ahead of the instant plan within this forecast range.
+forecast_no_cross,No sustained lead over the instant plan within this range; both plans may be identical.
+forecast_item,{0}: end mean base P/E/Q {1}/{2}/{3} (including zero after failure); end survival probability {4}%

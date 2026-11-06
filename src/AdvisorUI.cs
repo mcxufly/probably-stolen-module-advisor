@@ -12,6 +12,8 @@ namespace ModuleAdvisor
         private static readonly HashSet<GameItem> modules = new HashSet<GameItem>();
         private static bool initialized;
         private static int preference;
+        private static int forecastMode = 1;
+        private static int uses = 30;
         private static CustomUIWindow window;
         private static RectTransform results;
         internal static bool IsOpen => window != null && window.IsAlive && window.IsVisible;
@@ -44,7 +46,7 @@ namespace ModuleAdvisor
             modules.IntersectWith(snapshot.Modules);
             Close();
             var builder = CustomUIManager.Window(WindowId, L.Text("title"), CustomUIManager.LAYER_PAPER)
-                .SetSize(760, 620).Center().SetDraggable(true);
+                .SetSize(760, 700).Center().SetDraggable(true);
             builder.AddLabel(L.Text("intro"))
                 .BeginRow()
                 .AddButton(L.Text("refresh"), Open)
@@ -52,6 +54,14 @@ namespace ModuleAdvisor
                 .AddButton(L.Text("close"), Close).End()
                 .AddDropdown(new[] { L.Text("balanced"), L.Text("performance"), L.Text("efficiency"), L.Text("quality") },
                     preference, value => { preference = value; Invalidate(); })
+                .AddDropdown(new[] { L.Text("mode_instant"), L.Text("mode_safe"), L.Text("mode_mean"), L.Text("mode_burst") },
+                    forecastMode, value => { forecastMode = value; Invalidate(); })
+                .AddLabel(L.Text("uses_hint"))
+                .AddInput(L.Text("uses_hint"), uses.ToString(), value => {
+                    if (int.TryParse(value, out int parsed) && parsed >= 1 && parsed <= 100) uses = parsed;
+                    else window?.Get("uses")?.SetString(uses.ToString());
+                    Invalidate();
+                }, id: "uses")
                 .BeginTabs().BeginTab(L.Text("machines", availableMachines.Count));
             builder.BeginRow().AddButton(L.Text("all"), () => {
                 machines.UnionWith(availableMachines); Open();
@@ -138,6 +148,42 @@ namespace ModuleAdvisor
             if (machine.identifier == "deal_maker") output.AddLabel(L.Text("context_deal"));
         }
 
+        private static void ShowForecast(CustomUIBuilder output, GameEvaluation evaluator, Plan plan, Plan immediate,
+            IReadOnlyList<GameItem> selectedModules)
+        {
+            var chosen = evaluator.Forecast(plan.Placements, uses, 64);
+            var comparison = evaluator.Forecast(immediate.Placements, uses, 64);
+            output.AddHeader(L.Text("forecast_title", uses));
+            output.AddLabel(L.Text("forecast_summary", chosen.Mean.Last().ToString("0.##"),
+                chosen.Lower.Last().ToString("0.##"), (100 * chosen.AnyFailureProbability).ToString("0.##"), chosen.Samples));
+            output.AddLabel(L.Text("forecast_compare", comparison.Mean.Last().ToString("0.##"), comparison.Lower.Last().ToString("0.##")));
+            output.AddLabel(L.Text("forecast_note"));
+            if (chosen.Approximation) output.AddWarning(L.Text("forecast_approx"));
+            ForecastChart.Draw(output, chosen.Mean, comparison.Mean);
+            int crossing = -1;
+            for (int u = 0; u < uses; u++)
+                if (chosen.Mean[u] > comparison.Mean[u] + 1e-8
+                    && Enumerable.Range(u, uses - u).All(t => chosen.Mean[t] >= comparison.Mean[t] - 1e-8)) {crossing = u + 1; break;}
+            output.AddLabel(crossing > 0 ? L.Text("forecast_cross", crossing) : L.Text("forecast_no_cross"));
+            foreach (var group in plan.Placements.GroupBy(p => p.Bay))
+            {
+                var sorted = group.OrderBy(p => p.Module).ToList();
+                var forecast = evaluator.ForecastBay(group.Key, plan.Placements, uses, 64);
+                int existing = evaluator.Predict(group.Key, plan.Placements).ExistingCount;
+                for (int i = 0; i < sorted.Count; i++)
+                {
+                    var item = selectedModules[sorted[i].Module];
+                    var effects = GameAdapter.Effects(item);
+                    if (!effects.Any(e => e == ModuleEffectHelper.MODULE_EFFECT_LEARNING_ALGORITHM
+                        || e == ModuleEffectHelper.MODULE_EFFECT_DEGRADING || e == ModuleEffectHelper.MODULE_EFFECT_OVERVOLTED)) continue;
+                    var final = forecast.FinalBaseMeans[existing + i];
+                    output.AddLabel(L.Text("forecast_item", GameAdapter.Name(item), final[0].ToString("0.##"),
+                        final[1].ToString("0.##"), final[2].ToString("0.##"), (forecast.Survival[existing + i] * 100).ToString("0.##")));
+                }
+            }
+            output.AddSeparator();
+        }
+
         private static void Generate()
         {
             if (!IsOpen || results == null) return;
@@ -163,7 +209,18 @@ namespace ModuleAdvisor
                 var evaluator = new GameEvaluation(selectedBays, selectedModules, options, preference);
                 var nodeModules = new HashSet<int>(Enumerable.Range(0, selectedModules.Count)
                     .Where(m => selectedModules[m].IsGameItemType("NODE")));
-                var plan = LayoutPlanner.Solve(selectedModules.Count, options, evaluator.Evaluate, nodeModules);
+                var immediate = LayoutPlanner.Solve(selectedModules.Count, options, evaluator.Evaluate, nodeModules);
+                int temporalBudget = Math.Max(24, Math.Min(400, 100000 / Math.Max(1, uses * 16 * selectedBays.Count)));
+                var plan = forecastMode == 0 ? immediate : TemporalSearch.Improve(options, immediate,
+                    chosen => evaluator.Forecast(chosen, uses).Score(forecastMode), temporalBudget);
+                if (forecastMode != 0)
+                {
+                    double chosenScore = evaluator.Forecast(plan.Placements, uses, 64).Score(forecastMode);
+                    double instantScore = evaluator.Forecast(immediate.Placements, uses, 64).Score(forecastMode);
+                    if (instantScore > chosenScore) { plan = immediate; chosenScore = instantScore; }
+                    if (chosenScore < 0) plan = new Plan();
+                }
+                ShowForecast(output, evaluator, plan, immediate, selectedModules);
                 output.AddHeader(L.Text("plan_count", plan.Placements.Count));
                 output.AddLabel(L.Text("plan_note"));
                 var used = new HashSet<int>();

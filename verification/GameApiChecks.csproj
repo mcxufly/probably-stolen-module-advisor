@@ -11,6 +11,10 @@
     <Compile Include="../src/LayoutPlanner.cs" />
     <Compile Include="../src/MachineModel.cs" />
     <Compile Include="../src/GameEvaluation.cs" />
+    <Compile Include="TemporalChecks.cs" />
+    <Compile Include="../src/TemporalSimulation.cs" />
+    <Compile Include="../src/TemporalSearch.cs" />
+    <Compile Include="../src/GameForecast.cs" />
     <Compile Include="../src/GameAdapter.cs" />
     <Compile Include="../src/Planner.cs" />
     <Reference Include="Assembly-CSharp"><HintPath>$(ManagedDir)/Assembly-CSharp.dll</HintPath></Reference>

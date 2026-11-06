@@ -71,6 +71,7 @@ static class Program
         Console.WriteLine($"Real GridShape checks passed: default bay {free} free cells, {cases} rotation/flip cases.");
 
         LayoutChecks.Run();
+        TemporalChecks.Run();
         string folder = Path.GetFullPath("dist/ModuleAdvisor");
         var manifest = ModLoader.ParseManifestForTools(folder, out string problem);
         Check(manifest != null && problem == null, "Manifest invalid: " + problem);

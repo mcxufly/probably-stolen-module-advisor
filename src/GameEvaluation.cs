@@ -14,7 +14,7 @@ namespace ModuleAdvisor
         internal MachineModel Model;
     }
 
-    internal sealed class GameEvaluation
+    internal sealed partial class GameEvaluation
     {
         private readonly IReadOnlyList<Bay> bays;
         private readonly List<LayoutItem>[] existing;
@@ -23,6 +23,9 @@ namespace ModuleAdvisor
         private readonly MachineModel[] models;
         private readonly int preference;
         private readonly double[] baseline;
+        private readonly List<GameItem>[] existingSources;
+        private readonly Dictionary<Placement, GameItem> candidateSources = new Dictionary<Placement, GameItem>();
+        private readonly Dictionary<GameItem, int> stableIds = new Dictionary<GameItem, int>();
 
         internal GameEvaluation(IReadOnlyList<Bay> bays, IReadOnlyList<GameItem> modules,
             IReadOnlyList<Placement> options, int preference)
@@ -33,15 +36,21 @@ namespace ModuleAdvisor
             counted = new bool[bays.Count][];
             models = new MachineModel[bays.Count];
             baseline = new double[bays.Count];
+            existingSources = new List<GameItem>[bays.Count];
             for (int b = 0; b < bays.Count; b++)
             {
                 int width = bays[b].Grid.inventoryShape.width;
                 var installed = bays[b].Grid.childItems;
+                existingSources[b] = installed;
+                foreach (var item in installed)
+                    if (!stableIds.ContainsKey(item)) stableIds.Add(item, stableIds.Count + 1);
                 existing[b] = installed.Select(i => GameAdapter.ToLayout(i, i.modifiedShape, width)).ToList();
                 counted[b] = installed.Select(i => i.IsTag(ModuleHelper.MODULE_TAG) || i.IsGameItemType("NODE")).ToArray();
                 models[b] = ReadModel(bays[b].Machine);
                 baseline[b] = models[b].Measure(Sum(b, existing[b])).Score(preference);
             }
+            foreach (var module in modules)
+                if (!stableIds.ContainsKey(module)) stableIds.Add(module, stableIds.Count + 1);
             foreach (var option in options)
             {
                 var module = modules[option.Module];
@@ -50,6 +59,7 @@ namespace ModuleAdvisor
                 item.X = option.X;
                 item.Y = option.Y;
                 candidates.Add(option, item);
+                candidateSources.Add(option, module);
             }
         }
 
