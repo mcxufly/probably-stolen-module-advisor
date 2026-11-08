@@ -1,4 +1,4 @@
-# 模块搭配助手 / Module Advisor 0.3.0
+# 模块搭配助手 / Module Advisor 0.3.1
 
 为《深空当铺：可能是偷的》提供机器和模块搭配预览。使用游戏原生模组加载器和自定义 UI，无 Harmony 补丁。
 
@@ -64,7 +64,7 @@
 - 蓝线为当前方案平均累计新增偏好收益，橙线为即时推荐方案；横轴触发次数，纵轴偏好分，**不是信用点**。同时显示P10、风险、持续交叉点和新增长期模块的期末平均基础属性/存活概率。图示及属性明细仍表示初装状态，不是期末残骸摆放。
 - 预测固定当前配方/原料背景；不把一份原料当成真实无限补给，也不统计购买、拆装和替换费用。因此曲线是条件效用对比，不是产量账本或经济最优保证。
 
-升级旧版时退出游戏，用0.3.0安装包替换旧模组内容，再启动游戏；不需要重置存档。
+升级旧版时退出游戏，用0.3.1安装包替换旧模组内容，再启动游戏；不需要重置存档。
 
 ## 存档与卸载
 
@@ -92,6 +92,16 @@ dotnet run --project verification/GameApiChecks.csproj -c Release -- 0.46D
 python3 tools/check_localization.py
 ```
 
-`GameDir`/`ManagedDir` 可覆盖。打包脚本在 `dist/ModuleAdvisor/` 生成仅含自己的 DLL、清单、本地化和玩家说明的干净内容，并生成安装 ZIP。游戏 DLL、反编译输出、工具和开发测试不会随包分发。
+`GameDir`/`ManagedDir` 可覆盖。打包脚本在 `dist/ModuleAdvisor/` 生成仅含自己的 DLL、清单、本地化、玩家说明和许可证的干净内容，并生成安装 ZIP。游戏 DLL、反编译输出、工具和开发测试不会随包分发。
+
+## 许可证与对应源码
+
+Copyright (C) 2026 XuFly.
+
+本项目的原创Mod源码、文档、本地化及构建/验证工具采用 **GNU General Public License v3.0 only**（SPDX：`GPL-3.0-only`），完整条款见 [LICENSE](LICENSE)。你可以依许可证使用、修改、商业分发和再分发；分发时保留版权与许可声明，标明修改，并按GPLv3要求提供适用的对应源码。本项目按现状提供，不作任何担保。
+
+安装包与[GitHub发布页](https://github.com/mcxufly/probably-stolen-module-advisor/releases/tag/v0.3.1)中的源码包一一对应；[v0.3.1源码](https://github.com/mcxufly/probably-stolen-module-advisor/tree/v0.3.1)含修改和构建所需的原创源码与脚本。构建仍需用户自行提供合法游戏安装中的程序集；这些专有游戏/Unity程序集、资源和商标不随本项目分发，也不因本项目许可证而获得GPL授权。
+
+0.3.1是许可证与分发元数据更新，玩法逻辑沿用0.3.0，仍保留尚未游戏内实测的说明。既有版本标签不覆盖。
 
 官方参考：[中文指南](https://github.com/dragonpan2/probably-stolen-modding/blob/main/ModdingGuide.zh-CN.md)、[API 变更](https://github.com/dragonpan2/probably-stolen-modding/blob/main/APIChanges.zh-CN.md)。

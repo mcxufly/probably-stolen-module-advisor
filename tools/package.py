@@ -14,6 +14,9 @@ DIST.mkdir(parents=True)
 shutil.copy2(ROOT / 'bin/Release/netstandard2.1/ProbablyStolenModuleAdvisor.dll', DIST)
 shutil.copytree(ROOT / 'assets', DIST, dirs_exist_ok=True)
 shutil.copy2(ROOT / 'README.md', DIST)
+license_bytes = (ROOT / 'LICENSE').read_bytes()
+assert hashlib.sha256(license_bytes).hexdigest() == '3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986', 'Incomplete GPL v3 license'
+shutil.copy2(ROOT / 'LICENSE', DIST)
 version = ET.parse(DIST / 'manifest.xml').findtext('ModVersion')
 archive = ROOT / f'ModuleAdvisor-{version}.zip'
 with zipfile.ZipFile(archive, 'w', zipfile.ZIP_DEFLATED) as package:
