@@ -1,5 +1,9 @@
 title,Module Advisor
 hotkey,Open Module Advisor
+hotkey_press,Press a key…
+hotkey_waiting,Press a key to bind; Esc cancels. Click Apply to save.
+hotkey_reserved,This key cannot be bound. Choose another key.
+hotkey_conflict,{0} is already used by {1}. Choose another key.
 loaded,Module Advisor is ready. Press {0} to open.
 intro,Select machines and idle modules, choose a priority, then generate. Open the Results tab to review.
 refresh,Refresh items

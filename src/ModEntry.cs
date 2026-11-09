@@ -35,6 +35,7 @@ namespace ModuleAdvisor
         public void OnDisable()
         {
             Enabled = false;
+            HotkeyCapture.CancelActive();
             ModHook.OnGameLoadedNormal -= GameLoaded;
             ModHelper.RemoveGameOptions(Id);
             ModHelper.RemoveDebugFunctions(Id);

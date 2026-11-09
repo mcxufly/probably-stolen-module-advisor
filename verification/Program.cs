@@ -95,6 +95,11 @@ static class Program
             Check(!references.Any(r => mutations.Contains(r.Name)), "Preview contains an unexpected mutable game API.");
             Check(!references.Any(r => r.DeclaringType.Name == "CustomUIBuilder" && r.Name == "GetWindow"),
                 "Diagram must not use the builder getter that hides the live window.");
+            var captureRow = metadata.MainModule.Types.Single(t => t.Name == "HotkeyConfigRow");
+            Check(captureRow.CustomAttributes.Any(a => a.AttributeType.Name == "HarmonyPatch"), "Missing scoped keybind row patch.");
+            Check(references.Any(r => r.DeclaringType.Name == "KeyBindHelper" && r.Name == "PollCapture"), "Missing native key capture.");
+            Check(references.Any(r => r.DeclaringType.Name == "KeyBindHelper" && r.Name == "StopCapture"), "Missing native capture cleanup.");
+            Check(references.Any(r => r.DeclaringType.Name == "CustomUIElement" && r.Name == "SetString"), "Captured binding must update the native Apply/Reset field.");
         }
         var scan = ModScanner.Scan(new[] {dll}, allowed, folder, false);
         Console.WriteLine("Manifest and compatibility passed: " + manifest.ID + " / " + manifest.ModVersion + " / " + args[0]);

@@ -1,5 +1,9 @@
 title,模块搭配助手
 hotkey,打开模块搭配助手
+hotkey_press,请按下按键…
+hotkey_waiting,按下要绑定的键，Esc取消；完成后点击「应用」保存。
+hotkey_reserved,该按键不能绑定，请选择其他按键。
+hotkey_conflict,{0} 已用于「{1}」，请选择其他按键。
 loaded,模块搭配助手已就绪，按 {0} 打开。
 intro,勾选机器和空闲模块，选择偏好，再生成方案；结果在「搭配结果」页。
 refresh,刷新物品

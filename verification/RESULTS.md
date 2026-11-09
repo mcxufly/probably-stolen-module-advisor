@@ -1,4 +1,16 @@
-# 验证记录：0.3.1
+# 验证记录：0.3.2
+
+## 0.3.2按键配置修复（2026-11-09）
+
+- 用户截图确认模组配置页原先显示整数287。该值是Unity KeyCode.F6，不是ASCII；旧游戏选项里的原生按键绑定入口不受此问题影响。
+- 本模组hotkey行现在显示按键名，点击开始原生捕获；Esc取消、保留键和重复绑定提示、捕获完成帧快捷键抑制、窗口关闭/禁用清理均按当前API接入。
+- 保留原ConfigEntry<int>及hotkey键、隐藏原生pending输入控件，沿用Apply/Reset和已有配置，不迁移存档/快捷键。
+- 仅两个局部Harmony补丁：ModConfigWindow.BuildEntry只处理本mod的hotkey，GameOptionUIManager.PollKeyCapture只在本捕获ID持有服务时交由本控件轮询，防止原生选项窗口关闭时取消捕获。引用游戏自带0Harmony，不打包它。
+- 当前Assembly-CSharp SHA256为725cb999d019dff1ff31bed353c7f9bb8d81a7605a15de1f80f5a3a6cf7b1d05，已不同于11月6日；重新检查配置/捕获接口与实际清单归一化，PlayerSettings.bundleVersion仍0.46D。
+- 真实游戏DLL构建零警告错误；原有500组邻接/模型/长期整合检查通过；原生ModScanner217方法、零能力、无拒绝项。本地化88个键，中英/占位符一致。
+- 新增元数据检查确保有局部配置行补丁、原生PollCapture/StopCapture、pending字段SetString，避免又退化成可见数字输入。
+- 未实际运行游戏点击捕获，仍需游戏内验证主菜单/局内配置、F6显示、捕获保存/取消、恢复默认、冲突提示、关闭期间清理和重新载入配置；不将编译/扫描宣称交互验收。
+
 
 ## 0.3.1许可证更新
 
