@@ -32,6 +32,8 @@ placement,{0} → top-left (column {1}, row {2}), rotation {3}°, flipped: {4}
 estimate,Estimated module stats: performance {0}% / efficiency {1}% / quality {2}% · priority score {3}
 yes,Yes
 no,No
+short_no_fit,No free position
+short_not_chosen,Not recommended
 unassigned,Unassigned / function reference
 no_fit,No compatible free position in the selected machines, or four chemical upgrades already installed. Check type, space and whether the machine is working.
 optional,Compatible options: {0}. Each is checked individually against the current bay; plan space is not reserved here. Read the hover description for the function and tradeoffs before deciding.
@@ -45,7 +47,7 @@ permanent,Chemical upgrades lock on installation; a native module extractor can 
 too_large,Too many selected machines and modules. Select a smaller group and regenerate (maximum 80000 position checks).
 error,Could not generate the plan. Items may have changed. Refresh and retry; see the game log for details.
 diagram_large,This bay is too large for the diagram. Use the coordinates below.
-diagram_legend,Layout: X blocked · free · E existing · N recommended addition. Cells with the same ID form one item. Hover for details.
+diagram_legend,Initial layout · E existing / N new · Hover the item, ID or legend for details
 diagram_blocked,Blocked cell
 diagram_free,Free cell
 diagram_column,Column (left to right)

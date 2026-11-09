@@ -71,11 +71,15 @@ namespace ModuleAdvisor
                 var bays = snapshot.Bays.Where(b => b.Machine == machine).ToList();
                 int free = bays.Sum(b => FreeCells(b.Grid));
                 bool unknown = GameAdapter.Profile(machine) == null;
+                string tip = L.Text("machine_info", free, bays.Sum(b => b.Grid.childItems.Count))
+                    + "\n" + L.Text("location", GameAdapter.Location(machine))
+                    + (unknown ? "\n" + L.Text("manual_machine") : "");
+                builder.BeginRow(8, TextAnchor.MiddleLeft);
+                ItemVisual.Icon(builder, machine, tip);
                 builder.AddToggle(GameAdapter.Name(machine), machines.Contains(machine), value => {
                     if (value) machines.Add(machine); else machines.Remove(machine); Invalidate();
-                }).WithTooltip(L.Text("machine_info", free, bays.Sum(b => b.Grid.childItems.Count))
-                    + "\n" + L.Text("location", GameAdapter.Location(machine))
-                    + (unknown ? "\n" + L.Text("manual_machine") : ""));
+                }).WithTooltip(tip);
+                builder.End();
             }
             if (availableMachines.Count == 0) builder.AddLabel(L.Text("no_machines"));
             builder.End().End().BeginTab(L.Text("modules", snapshot.Modules.Count))
@@ -84,10 +88,13 @@ namespace ModuleAdvisor
                 }).AddButton(L.Text("none"), () => { modules.Clear(); Open(); }).End().BeginScroll(360);
             foreach (var module in snapshot.Modules)
             {
+                builder.BeginRow(8, TextAnchor.MiddleLeft);
+                ItemVisual.Icon(builder, module, GameAdapter.Details(module));
                 builder.AddToggle(GameAdapter.Name(module) + (GameAdapter.ManualOnly(module) ? " · " + L.Text("manual") : ""),
                     modules.Contains(module), value => {
                         if (value) modules.Add(module); else modules.Remove(module); Invalidate();
                     }).WithTooltip(GameAdapter.Details(module));
+                builder.End();
             }
             if (snapshot.Modules.Count == 0) builder.AddLabel(L.Text("no_modules"));
             builder.End().End().BeginTab(L.Text("results")).BeginScroll(360);
@@ -140,12 +147,13 @@ namespace ModuleAdvisor
             if (after.PowerFloor) output.AddLabel(L.Text("cap_power"));
             if (after.PerformanceCapped) output.AddLabel(L.Text("cap_performance"));
             if (after.QualityCapped) output.AddLabel(L.Text("cap_quality"));
-            if (machine.identifier == "hydroponic") output.AddLabel(L.Text("context_hydro"));
-            if (machine.identifier == "plant_dna_manipulator") output.AddLabel(L.Text("context_dna"));
-            if (machine.identifier == "furnace") output.AddLabel(L.Text("context_furnace"));
-            if (machine.identifier == "printer") output.AddLabel(L.Text("context_printer"));
-            if (machine.identifier == "water_purifier") output.AddLabel(L.Text("context_purifier"));
-            if (machine.identifier == "deal_maker") output.AddLabel(L.Text("context_deal"));
+            string context = machine.identifier == "hydroponic" ? "context_hydro"
+                : machine.identifier == "plant_dna_manipulator" ? "context_dna"
+                : machine.identifier == "furnace" ? "context_furnace"
+                : machine.identifier == "printer" ? "context_printer"
+                : machine.identifier == "water_purifier" ? "context_purifier"
+                : machine.identifier == "deal_maker" ? "context_deal" : null;
+            output.WithTooltip(context == null ? L.Text("plan_note") : L.Text(context));
         }
 
         private static void ShowForecast(CustomUIBuilder output, GameEvaluation evaluator, Plan plan, Plan immediate,
@@ -155,16 +163,16 @@ namespace ModuleAdvisor
             var comparison = evaluator.Forecast(immediate.Placements, uses, 64);
             output.AddHeader(L.Text("forecast_title", uses));
             output.AddLabel(L.Text("forecast_summary", chosen.Mean.Last().ToString("0.##"),
-                chosen.Lower.Last().ToString("0.##"), (100 * chosen.AnyFailureProbability).ToString("0.##"), chosen.Samples));
+                chosen.Lower.Last().ToString("0.##"), (100 * chosen.AnyFailureProbability).ToString("0.##"), chosen.Samples))
+                .WithTooltip(L.Text("forecast_note"));
             output.AddLabel(L.Text("forecast_compare", comparison.Mean.Last().ToString("0.##"), comparison.Lower.Last().ToString("0.##")));
-            output.AddLabel(L.Text("forecast_note"));
             if (chosen.Approximation) output.AddWarning(L.Text("forecast_approx"));
             ForecastChart.Draw(output, chosen.Mean, comparison.Mean);
             int crossing = -1;
             for (int u = 0; u < uses; u++)
                 if (chosen.Mean[u] > comparison.Mean[u] + 1e-8
                     && Enumerable.Range(u, uses - u).All(t => chosen.Mean[t] >= comparison.Mean[t] - 1e-8)) {crossing = u + 1; break;}
-            output.AddLabel(crossing > 0 ? L.Text("forecast_cross", crossing) : L.Text("forecast_no_cross"));
+            if (crossing > 0) output.AddLabel(L.Text("forecast_cross", crossing));
             foreach (var group in plan.Placements.GroupBy(p => p.Bay))
             {
                 var sorted = group.OrderBy(p => p.Module).ToList();
@@ -221,30 +229,22 @@ namespace ModuleAdvisor
                     if (chosenScore < 0) plan = new Plan();
                 }
                 ShowForecast(output, evaluator, plan, immediate, selectedModules);
-                output.AddHeader(L.Text("plan_count", plan.Placements.Count));
-                output.AddLabel(L.Text("plan_note"));
+                output.AddHeader(L.Text("plan_count", plan.Placements.Count)).WithTooltip(L.Text("plan_note"));
                 var used = new HashSet<int>();
                 foreach (var group in plan.Placements.GroupBy(p => p.Bay))
                 {
                     var bay = selectedBays[group.Key];
                     var additions = group.ToList();
                     var prediction = evaluator.Predict(group.Key, plan.Placements);
+                    output.BeginRow(8, TextAnchor.MiddleLeft);
+                    ItemVisual.Icon(output, bay.Machine, GameAdapter.Details(bay.Machine));
                     output.AddHeader(GameAdapter.Name(bay.Machine) + " · " + L.Text("bay", bay.Number));
-                    BayDiagram.Draw(output, window, bay, additions, selectedModules);
+                    output.End();
+                    BayDiagram.Draw(output, window, bay, additions, selectedModules, prediction);
                     output.AddLabel(L.Text("totals_change", prediction.Before[0], prediction.Before[1], prediction.Before[2],
                         prediction.After[0], prediction.After[1], prediction.After[2]));
                     ShowMetrics(output, bay.Machine, prediction);
-                    int newIndex = 0;
-                    foreach (var placement in additions)
-                    {
-                        used.Add(placement.Module);
-                        var module = selectedModules[placement.Module];
-                        int[] stats = prediction.ItemStats[prediction.ExistingCount + newIndex++];
-                        output.AddLabel("N" + newIndex + " · " + L.Text("placement", GameAdapter.Name(module), placement.X + 1,
-                            placement.Y + 1, placement.Rotation * 90, placement.Flipped ? L.Text("yes") : L.Text("no")))
-                            .WithTooltip(GameAdapter.Details(module));
-                        output.AddLabel(L.Text("estimate_layout", stats[0], stats[1], stats[2]));
-                    }
+                    foreach (var placement in additions) used.Add(placement.Module);
                     output.AddSeparator();
                 }
                 output.AddHeader(L.Text("unassigned"));
@@ -266,10 +266,13 @@ namespace ModuleAdvisor
                         }
                     }
                     bool manual = GameAdapter.ManualOnly(module) || unknownCompatible;
-                    output.AddLabel(GameAdapter.Name(module)).WithTooltip(GameAdapter.Details(module));
-                    output.AddLabel(compatible.Count == 0 ? L.Text("no_fit") : manual
-                        ? L.Text("optional", string.Join(" / ", compatible.Distinct()))
-                        : L.Text("not_chosen"));
+                    string reason = compatible.Count == 0 ? L.Text("no_fit") : manual
+                        ? L.Text("optional", string.Join(" / ", compatible.Distinct())) : L.Text("not_chosen");
+                    output.BeginRow(6, TextAnchor.MiddleLeft);
+                    ItemVisual.Icon(output, module, GameAdapter.Details(module) + "\n" + reason, 30);
+                    output.AddLabel(GameAdapter.Name(module) + " · " + L.Text(compatible.Count == 0 ? "short_no_fit"
+                        : manual ? "manual" : "short_not_chosen")).WithTooltip(GameAdapter.Details(module) + "\n" + reason);
+                    output.End();
                 }
                 if (used.Count == selectedModules.Count) output.AddLabel(L.Text("all_assigned"));
                 output.AddLabel(L.Text("refresh_note"));

@@ -95,6 +95,12 @@ static class Program
             Check(!references.Any(r => mutations.Contains(r.Name)), "Preview contains an unexpected mutable game API.");
             Check(!references.Any(r => r.DeclaringType.Name == "CustomUIBuilder" && r.Name == "GetWindow"),
                 "Diagram must not use the builder getter that hides the live window.");
+            var visual = metadata.MainModule.Types.Single(t => t.Name == "ItemVisual");
+            var spriteRead = visual.Methods.Single(m => m.Name == "Sprite").Body.Instructions
+                .Select(i => i.Operand).OfType<DseCecil.MethodReference>().ToArray();
+            Check(spriteRead.Any(r => r.DeclaringType.Name == "GameItemElement" && r.Name == "get_background")
+                && spriteRead.Any(r => r.Name == "get_sprite"), "Thumbnail must read the live background sprite, not a guessed atlas.");
+            Check(!references.Any(r => r.DeclaringType.Name == "Sprite" && r.Name == "Create"), "Preview must not create copies of game sprite resources.");
             var captureRow = metadata.MainModule.Types.Single(t => t.Name == "HotkeyConfigRow");
             Check(captureRow.CustomAttributes.Any(a => a.AttributeType.Name == "HarmonyPatch"), "Missing scoped keybind row patch.");
             Check(references.Any(r => r.DeclaringType.Name == "KeyBindHelper" && r.Name == "PollCapture"), "Missing native key capture.");

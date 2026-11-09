@@ -3,7 +3,7 @@
     <TargetFramework>netstandard2.1</TargetFramework>
     <LangVersion>latest</LangVersion>
     <AssemblyName>ProbablyStolenModuleAdvisor</AssemblyName>
-    <Version>0.3.2</Version>
+    <Version>0.4.0</Version>
     <PackageLicenseExpression>GPL-3.0-only</PackageLicenseExpression>
     <Copyright>Copyright (C) 2026 XuFly</Copyright>
     <RepositoryUrl>https://github.com/mcxufly/probably-stolen-module-advisor</RepositoryUrl>
