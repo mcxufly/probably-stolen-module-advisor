@@ -77,7 +77,7 @@
 - 开发基准：本机完整版，Steam build **26337366**，Unity `PlayerSettings.bundleVersion` **0.46D**。
 - 对本机真实游戏 DLL 编译，目标 `netstandard2.1`。
 - 独立算法测试、真实形状/属性接口验证、本地化一致性、清单解析、兼容版本与原版 ModScanner 扫描，详见 `verification/RESULTS.md`。
-- **尚未进行实际游戏画面和交互验收。** 需要在游戏内确认窗口布局、F6、勾选、推荐位置、语言切换和载入/退出。自动验证不代替这些操作。
+- **2026-11-09：用户已确认0.4.0游戏内测试完成。** 此为用户实测反馈，和上述自动验证分别记录；未提供逐场景清单，不扩大为所有分辨率、存档或第三方模组组合均已覆盖。
 
 ## 开发与打包
 
@@ -102,8 +102,8 @@ Copyright (C) 2026 XuFly.
 
 本项目的原创Mod源码、文档、本地化及构建/验证工具采用 **GNU General Public License v3.0 only**（SPDX：`GPL-3.0-only`），完整条款见 [LICENSE](LICENSE)。你可以依许可证使用、修改、商业分发和再分发；分发时保留版权与许可声明，标明修改，并按GPLv3要求提供适用的对应源码。本项目按现状提供，不作任何担保。
 
-安装包与[GitHub发布页](https://github.com/mcxufly/probably-stolen-module-advisor/releases/tag/v0.3.1)中的源码包一一对应；[v0.3.1源码](https://github.com/mcxufly/probably-stolen-module-advisor/tree/v0.3.1)含修改和构建所需的原创源码与脚本。构建仍需用户自行提供合法游戏安装中的程序集；这些专有游戏/Unity程序集、资源和商标不随本项目分发，也不因本项目许可证而获得GPL授权。
+安装包与[GitHub发布页](https://github.com/mcxufly/probably-stolen-module-advisor/releases/tag/v0.4.0)中的源码包一一对应；[v0.4.0源码](https://github.com/mcxufly/probably-stolen-module-advisor/tree/v0.4.0)含修改和构建所需的原创源码与脚本。构建仍需用户自行提供合法游戏安装中的程序集；这些专有游戏/Unity程序集、资源和商标不随本项目分发，也不因本项目许可证而获得GPL授权。
 
-0.3.1是许可证与分发元数据更新，玩法逻辑沿用0.3.0，仍保留尚未游戏内实测的说明。既有版本标签不覆盖。
+v0.4.0实现标签与对应安装/源码包保持原样。用户实测确认在该标签之后以签名文档提交补记，发布页同步说明；包内的测试状态文字是打包时的历史记录，以本节和发布页最新记录为准。既有版本标签不覆盖。
 
 官方参考：[中文指南](https://github.com/dragonpan2/probably-stolen-modding/blob/main/ModdingGuide.zh-CN.md)、[API 变更](https://github.com/dragonpan2/probably-stolen-modding/blob/main/APIChanges.zh-CN.md)。
